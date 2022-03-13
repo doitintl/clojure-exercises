@@ -21,7 +21,7 @@
 
 (defn parse [file-content]
   "Convert raw input into basic data structure"
-  (let [split-to-lines (fn [file-content] (str/split-lines file-content))
+  (let [split-to-linesgi (fn [file-content] (str/split-lines file-content))
         comma-separate-pairs (fn [lines] (map #(str/split % #",") lines))
         gender-and-num (fn [gender-and-num-as-str] (map (fn [[gender num-as-str]]
                                                           [gender (Double/parseDouble num-as-str)]) gender-and-num-as-str))
@@ -41,20 +41,20 @@
 
 (defn counts-by-bucket [gender-and-ages]
   "Take a map which maps gender to a sequence of numbers, and
-  output a map which maps genders to a map of buckets (indexed by the bottom of the bucket) to a  count of ages in that bucket"
+  return a map which maps genders to a map of buckets (indexed by the bottom of the bucket) to a  count of ages in that bucket"
   (->> gender-and-ages (group-by-bucket) (map (fn [[gender, ages]] [gender, (count ages)])) (into {})))
 
 
 (defn gender-to-age-list [gender-and-gender-and-age-pairs]
-  "Just cleanup. Take a map which maps gender to a sequence of pairs of [gender, age] (where the first lement of that
-  pair is clearly redundant), and return a map which maps gender to a sequence of ages.
-  output a map which maps genders to a map of buckets (indexed by the bottom of the bucket) to a  count of ages in that bucket"
+  "Just cleanup. Take a map which maps gender to a sequence of pairs of [gender, age] (where the first element of that
+  pair is clearly redundant),
+  and return a map which maps gender to a sequence of ages."
   (map (fn [[gender gender-and-age-pairs]]
          [gender (map #(second %) gender-and-age-pairs)])
        gender-and-gender-and-age-pairs))
 
 (defn bucketed-by-gender [filename]
-  "Given the file, create the full datastructure that will be converted to a histogram"
+  "Given the file, create the full data-structure that will be converted to a histogram"
   (let [
         group-by-gender (fn [gender-and-stats] (group-by #(first %) gender-and-stats))
         pairs (map (fn [[gender age-list]]
@@ -66,14 +66,14 @@
 
 (defn bucketed-by-gender-to-hist [bucketed-by-gender]
   (let [
-        hist-to-str (fn [hist char] (let [sorted (into (sorted-map) ;;sorted-map is needed to sort buckets by (of course) age.
-                                                       hist) pad (fn [len s]
+        histogram-data-to-str (fn [histogram-data char] (let [sorted (into (sorted-map) ;;sorted-map is needed to sort buckets by (of course) age.
+                                                       histogram-data) pad (fn [len s]
                                                                    (str s (str/join (repeat (max 0 (- len (count s))) " "))))]
                                       (let [pad-len 3]
                                         (str/join "\n" (map #(str (pad pad-len (str (first %))) " " (str/join (repeat (second %) char)))
                                                             sorted)))))
-        gender-to-s (fn [gender counts] (hist-to-str counts gender))
+        one-gender-histogram-to-string (fn [gender counts] (histogram-data-to-str counts gender))
         ]
-    (str/join "\n\n" (map (fn [[gender stats]] (gender-to-s gender stats)) bucketed-by-gender))))
+    (str/join "\n\n" (map (fn [[gender stats]] (one-gender-histogram-to-string gender stats)) bucketed-by-gender))))
 
 (println (bucketed-by-gender-to-hist (bucketed-by-gender "genderage.csv")))
