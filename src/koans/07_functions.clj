@@ -38,5 +38,6 @@
          (fn [n] (* n n))))
 
   "But they are often better written using the names of functions"
-  ;;(= 25 (___ square))
+  ;;? What do they want here?
+  (= 25 (let [square (fn [x] (* x x))] (apply  square[ 5])))
   )
