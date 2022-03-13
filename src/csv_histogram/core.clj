@@ -8,8 +8,7 @@
 ;; ** Structural editing: I see the shortcuts. I need to grok them better
 ;; ** Macros
 
-(ns csv_histogram.core)
-(require '[clojure.string :as str])
+(ns csv-histogram.core (:require  [clojure.string :as str]))
 
 (defn readfile
   "load file into memory as string."
@@ -27,53 +26,39 @@
 
 (defn pairs [lines_] (map #(str/split %1 #",") lines_))
 ;; How do I use shortform lambda #( % )here?
-(defn pairs_with_double [pairs_] (map (fn [pair]
-                                        ;; See below  for mapping a map
-                                        [(nth pair 0) (Double/parseDouble (nth pair 1))]) pairs_))
+(defn pairs_with_double [pairs_] (map (fn [[k v]]
+                                        [k (Double/parseDouble v)]) pairs_))
 
-(defn by-gender [pairs_] (group-by #(nth % 0) pairs_))
+(defn by-gender [pairs_] (group-by #(first %) pairs_))
 
-(defn by-bucket [sequence & [width]]
-  (let [grouped (group-by
-                  (fn [x]
-                    (int (scaled_floor x :precision (* -1 (or width 1)))))
-                  sequence)]
-    (into (sorted-map) (sort-by first (seq grouped)))))
+(defn by-bucket [sequence & [width]]  (->> sequence
+                                           (group-by (fn [x]
+                                                       (int (scaled_floor x :precision (* -1 (or width 1))))))
+                                           (into {})))
 
-(defn counts-by-bucket [sequence] (let [b (by-bucket sequence)]
-                                    (let [s (seq b)]
-                                      (let [pairs (map (fn [pair]
-                                                         ;; Mapping a map, use
-                                                         ;;(into {} (map
-                                                         ;;        (fn [[k v]] [k (function-for-transforming-value v)])
-                                                         ;;        input-map))
-                                                         [(nth pair 0), (count (nth pair 1))]) s)]
-                                        (into (sorted-map) pairs)))))
+(defn counts-by-bucket [sequence] (let [b (by-bucket sequence) pairs (map (fn [[k, v]]
+                                                                            [k, (count v)]) b)]
+                                    (into {} pairs)))
 
-(defn by-gender-pairs [lines_] (seq (by-gender (pairs_with_double (pairs lines_)))))
+(defn by-gender-pairs [lines_] (by-gender (pairs_with_double (pairs lines_))))
 
-(defn gender-to-age-list [by-gender-pairs_] (map (fn [gender-and-seq]
-                                                   ;; See above for mapping a map
-                                                   [(nth gender-and-seq 0) (map #(nth % 1) (nth gender-and-seq 1))])
+(defn gender-to-age-list [by-gender-pairs_] (map (fn [[gender sequence]]
+                                                   [gender (map #(nth % 1) sequence)])
                                                  by-gender-pairs_))
-(defn bucketed-by-gender [filename] (let [pairs (map (fn [gender-and-age-list]
-                                                       ;; See above for mapping a map
-                                                       (let [gender (nth gender-and-age-list 0)]
-                                                         [gender, (counts-by-bucket (nth gender-and-age-list 1))]))
-                                                     ;; [A] This function is the  top-level function that chains several other functions as in the following line..
-                                                     ;; Is that good? Or does it put too much complexity right here in this function?
+(defn bucketed-by-gender [filename] (let [pairs (map (fn [[gender age-list]]
+                                                       [gender (counts-by-bucket age-list)])
                                                      (gender-to-age-list (by-gender-pairs (lines (readfile filename)))))]
-                                      (into (sorted-map) pairs)))
+                                      (into  {}  pairs)))
 
-(defn hist-to-str [hist ch] (let [sorted (into (sorted-map)
-                                               (sort-by first (seq hist))) pad (fn [len s]
-                                                                                 (str s (str/join (repeat (max 0 (- len (count s))) " "))))]
-                              (let [sq (seq sorted) pad-len 3]
-                                (str/join "\n" (map #(str (pad pad-len (str (nth % 0))) " " (str/join (repeat (nth % 1) ch)))
-                                                    sq)))))
+(defn hist-to-str [hist ch] (let [sorted (into (sorted-map) ;;sorted-map needed to preserve order given in the next form
+                                               (sort-by first hist)) pad (fn [len s]
+                                                                           (str s (str/join (repeat (max 0 (- len (count s))) " "))))]
+                              (let [pad-len 3]
+                                (str/join "\n" (map #(str (pad pad-len (str (first %))) " " (str/join (repeat (nth % 1) ch)))
+                                                    sorted)))))
 
 (defn bucketed-by-gender-to-hist [bucketed-by-gender_]
   (let [gender_to_s (fn [gender counts] (hist-to-str counts gender))]
-    (let [sq (seq bucketed-by-gender_)] (str/join "\n\n" (map (fn [pair] (gender_to_s (nth pair 0) (nth pair 1))) sq)))))
+    (str/join "\n\n" (map (fn [[gender  stats]] (gender_to_s gender stats)) bucketed-by-gender_))))
 
 (println (bucketed-by-gender-to-hist (bucketed-by-gender "genderage.csv")))
