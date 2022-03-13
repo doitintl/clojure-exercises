@@ -24,8 +24,8 @@
   (= '(1 9 25 49 81)
      (map (fn [x] (* x x))
           (filter odd? (range 10)))
-     (for [x (range 10) :when __]
-       __))
+     (for [x (range 10) :when (odd? x)]
+        (* x x )))
 
   "More complex transformations simply take multiple binding forms"
   (= [[:top :left] [:top :middle] [:top :right]
@@ -33,4 +33,4 @@
       [:bottom :left] [:bottom :middle] [:bottom :right]]
      (for [row [:top :middle :bottom]
            column [:left :middle :right]]
-       __)))
+       [row column])))
