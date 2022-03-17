@@ -4,13 +4,13 @@
 
 (def test-address
   {:street-address "123 Test Lane"
-   :city "Testerville"
-   :state "TX"})
+   :city           "Testerville"
+   :state          "TX"})
 
 (meditations
   "Destructuring is an arbiter: it breaks up arguments"
   (= ":bar:foo" ((fn [[a b]] (str b a))
-         [:foo :bar]))
+                 [:foo :bar]))
 
   "Whether in function definitions"
   (= (str "An Oxford comma list of apples, "
@@ -23,7 +23,7 @@
   (= "Rich Hickey aka The Clojurer aka Go Time aka Lambda Guru"
      (let [[first-name last-name & aliases]
            (list "Rich" "Hickey" "The Clojurer" "Go Time" "Lambda Guru")]
-    (str   first-name " " last-name " aka " ( str/join " aka " aliases))
+       (str first-name " " last-name " aka " (str/join " aka " aliases))
        )
      )
 
@@ -36,14 +36,24 @@
   "Break up maps by key"
   (= "123 Test Lane, Testerville, TX"
      (let [{street-address :street-address, city :city, state :state} test-address]
-        (str/join ", " [ street-address city state])))
+       (str/join ", " [street-address city state])))
 
   "Or more succinctly"
   (= "123 Test Lane, Testerville, TX"
      (let [{:keys [street-address city state]} test-address]
-       (str/join ", " [ street-address city state])))
-  ; What are they looking for here?
-  ;"All together now!"
-  ;(= "Test Testerson, 123 Test Lane, Testerville, TX"
-  ;   (___ ["Test" "Testerson"] test-address))
+       (str/join ", " [street-address city state])))
+
+  ;; ?? FOr the following, is my soluton really what they want? I hjad to replace more than just the ___
+  ;;"All together now!"
+  ;;(= "Test Testerson, 123 Test Lane, Testerville, TX"
+  ;;   (___ ["Test" "Testerson"] test-address)))
+
+  "All together now!"
+  (= "Test Testerson, 123 Test Lane, Testerville, TX"
+     (str/join ", "
+               (conj
+                 (vals test-address)
+                 (str/join " " ["Test" "Testerson"]))
+               )
+     )
   )

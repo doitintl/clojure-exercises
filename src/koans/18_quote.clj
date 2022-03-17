@@ -7,7 +7,7 @@
   (= (quote (1 2 3 4 5)) '(1 2 3 4 5))
 
   "There is a shortcut too!"
-  (= (quote  (1 2 3 4 5)) '(1 2 3 4 5))
+  (= (quote (1 2 3 4 5)) '(1 2 3 4 5))
 
   "You can quote symbols as well as lists... without evaluation!"
   (= 'age (let [age 9] (quote age)))

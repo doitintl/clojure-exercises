@@ -1,7 +1,8 @@
-;; - Need to learn
+;;  ?? Need to learn
 ;; ** Repl: How to use Repl with this module rather than standalone
 ;; ** Structural editing: I see the shortcuts. I need to grok them better
 ;; ** Macros
+;;
 
 (ns csv-histogram.core
   (:require [clojure.string :as str]))
@@ -69,8 +70,8 @@
         histogram-data-to-str (fn [histogram-data char]
                                 (let [
                                       sorted (into (sorted-map) histogram-data) pad (fn [len s]
-                                                                         (str s (str/join (repeat (max 0 (- len (count s))) " "))))]
-                                  (str/join "\n" (map #(str (pad pad-len (str (first %))) " " (str/join (repeat (second %) char)))  sorted))))
+                                                                                      (str s (str/join (repeat (max 0 (- len (count s))) " "))))]
+                                  (str/join "\n" (map #(str (pad pad-len (str (first %))) " " (str/join (repeat (second %) char))) sorted))))
         one-gender-histogram-to-string (fn [gender counts] (histogram-data-to-str counts gender))
         ]
     (str/join "\n\n" (map (fn [[gender stats]] (one-gender-histogram-to-string gender stats)) bucketed-by-gender))))

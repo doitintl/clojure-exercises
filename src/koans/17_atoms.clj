@@ -9,12 +9,12 @@
 
   "You can change at the swap meet"
   (= 1 (do
-          (swap! atomic-clock inc)
-          @atomic-clock))
+         (swap! atomic-clock inc)
+         @atomic-clock))
 
   "Keep taxes out of this: swapping requires no transaction"
   (= 5 (do
-         (swap! atomic-clock (fn [_]  5) )
+         (swap! atomic-clock (fn [_] 5))
          @atomic-clock))
 
   "Any number of arguments might happen during a swap"

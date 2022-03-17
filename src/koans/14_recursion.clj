@@ -7,31 +7,31 @@
     (not (is-even? (dec n)))))
 
 (defn is-even-bigint? [n]
-  (loop [m  n
+  (loop [m n
          acc true]
     (if (= m 0)
       acc
       (recur (dec m) (not acc)))))
 
 (defn recursive-reverse [coll]
-   (if (= 0 (count coll) ) '()
-  (conj (vec (recursive-reverse(  rest coll))) (first coll)))
+  (if (= 0 (count coll)) '()
+                         (conj (vec (recursive-reverse (rest coll))) (first coll)))
   )
 
 (defn factorial_recursive [n]
-  (if (= n 1 )
+  (if (= n 1)
     1
     (* n (factorial_recursive (dec n)))
     ))
 
 (defn factorial [n]
-  (loop [m  n
+  (loop [m n
          acc 1]
     (if (= m 1)
       acc
       (recur (dec m) (* acc m)))))
 
-(println (factorial 3))
+
 (meditations
   "Recursion ends with a base case"
   (= true (is-even? 0))

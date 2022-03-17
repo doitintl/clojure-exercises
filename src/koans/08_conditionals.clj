@@ -3,10 +3,10 @@
 
 (defn explain-exercise-velocity [exercise-term]
   (case exercise-term
-        :bicycling        "pretty fast"
-        :jogging          "not super fast"
-        :walking          "not fast at all"
-        "is that even exercise?"))
+    :bicycling "pretty fast"
+    :jogging "not super fast"
+    :walking "not fast at all"
+    "is that even exercise?"))
 
 (meditations
   "You will face many decisions"
@@ -20,12 +20,12 @@
 
   "And in such a situation you may have nothing"
   (= nil (if (nil? 0)
-          [:a :b :c]))
+           [:a :b :c]))
 
   "In others your alternative may be interesting"
   (= :glory (if (not (empty? ()))
               :doom
-             :glory))
+              :glory))
 
   "You may have a multitude of possible paths"
   (let [x 5]
@@ -35,8 +35,8 @@
 
   "Or your fate may be sealed"
   (= 'doom (if-not (zero? 1)
-          'doom
-          'more-doom))
+             'doom
+             'more-doom))
 
   "In case of emergency, go fast"
   (= "pretty fast"

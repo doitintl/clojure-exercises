@@ -6,7 +6,7 @@
   (= true true)
 
   "To understand reality, we must compare our expectations against reality"
-  (= 2(+ 1 1))
+  (= 2 (+ 1 1))
 
   "You can test equality of many things"
   (= (+ 3 4) 7 (+ 2 5))
@@ -21,7 +21,7 @@
   (= true (== 2.0 2))
 
   "Something is not equal to nothing"
-  (=  (not (= 1 nil)))
+  (= (not (= 1 nil)))
 
   "Strings, and keywords, and symbols: oh my!"
   (= false (= "hello" :hello 'hello))
